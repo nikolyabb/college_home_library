@@ -216,3 +216,19 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# macOS
+.DS_Store
+
+# Django collectstatic & runtime data
+/staticfiles/
+/data/
+*.sqlite3
+
+# Environment files (broader coverage)
+.env.*
+!.env.example
+
+# IDE (uncomment if you use JetBrains/VS Code)
+# .idea/
+# .vscode/
