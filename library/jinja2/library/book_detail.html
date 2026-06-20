@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ book.title }} — Домашняя библиотека{% endblock %}
+
+{% block content %}
+<article class="book-detail">
+    <div class="book-detail__header">
+        <div>
+            <h1 class="book-detail__title">{{ book.title }}</h1>
+            {% if book.author %}
+                <p class="book-detail__author">{{ book.author }}</p>
+            {% endif %}
+        </div>
+        {% if book.is_available() %}
+            <span class="badge">Свободна</span>
+        {% else %}
+            {% set borrowing = book.current_borrowing() %}
+            {% if borrowing.is_overdue() %}
+                <span class="badge badge--dark">Просрочено</span>
+            {% else %}
+                <span class="badge badge--dark">На руках</span>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="book-detail__info">
+        <p>
+            <span class="book-detail__label">Владелец:</span>
+            {{ book.owner.username }}
+        </p>
+        {% if book.isbn %}
+            <p>
+                <span class="book-detail__label">ISBN:</span>
+                {{ book.isbn }}
+            </p>
+        {% endif %}
+        {% if not book.is_available() %}
+            {% set borrowing = book.current_borrowing() %}
+            <p>
+                <span class="book-detail__label">У кого:</span>
+                {{ borrowing.borrower.username }}
+            </p>
+            <p>
+                <span class="book-detail__label">Взял(а):</span>
+                {{ borrowing.borrowed_at.strftime('%d.%m.%Y') }}
+            </p>
+            {% if borrowing.due_date %}
+                <p>
+                    <span class="book-detail__label">Срок возврата:</span>
+                    {{ borrowing.due_date.strftime('%d.%m.%Y') }}
+                </p>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    {% if book.description %}
+        <div class="book-detail__desc">
+            <h3>Описание</h3>
+            <p>{{ book.description }}</p>
+        </div>
+    {% endif %}
+
+    <div class="book-detail__actions">
+        {% if book.is_available() %}
+            <a href="{{ url('book_borrow', pk=book.pk) }}" class="btn btn--primary">Взять почитать</a>
+        {% else %}
+            {% set borrowing = book.current_borrowing() %}
+            {% if borrowing.borrower == request.user or book.owner == request.user %}
+                <a href="{{ url('book_return', pk=book.pk) }}" class="btn btn--primary">Вернуть книгу</a>
+            {% endif %}
+        {% endif %}
+
+        {% if book.owner == request.user %}
+            <a href="{{ url('book_edit', pk=book.pk) }}" class="btn btn--secondary">Редактировать</a>
+            <a href="{{ url('book_delete', pk=book.pk) }}" class="btn btn--secondary">Удалить</a>
+        {% endif %}
+    </div>
+</article>
+
+<article class="history">
+    <h2 class="history__title">История выдач</h2>
+
+    {% if history %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Читатель</th>
+                        <th>Взял(а)</th>
+                        <th>Вернул(а)</th>
+                        <th>Срок возврата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in history %}
+                        <tr>
+                            <td>{{ record.borrower.username }}</td>
+                            <td>{{ record.borrowed_at.strftime('%d.%m.%Y') }}</td>
+                            <td>
+                                {% if record.returned_at %}
+                                    {{ record.returned_at.strftime('%d.%m.%Y') }}
+                                {% else %}
+                                    <span class="badge badge--dark">На руках</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if record.due_date %}
+                                    {{ record.due_date.strftime('%d.%m.%Y') }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="history__empty">История выдач пуста.</p>
+    {% endif %}
+</article>
+{% endblock %}

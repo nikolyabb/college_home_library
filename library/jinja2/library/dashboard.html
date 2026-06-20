@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Моя полка — Домашняя библиотека{% endblock %}
+
+{% block content %}
+<div class="section__header">
+    <div>
+        <h1 class="section__title">Моя полка</h1>
+        <p class="section__subtitle">Книги, которые вы добавили, и книги, которые вы взяли.</p>
+    </div>
+    <a href="{{ url('book_add') }}" class="btn btn--primary">Добавить книгу</a>
+</div>
+
+<article class="dashboard-section">
+    <div class="dashboard-section__header">
+        <h2 class="dashboard-section__title">Мои книги</h2>
+    </div>
+
+    {% if my_books %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Автор</th>
+                        <th>Статус</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in my_books %}
+                        <tr>
+                            <td>
+                                <a href="{{ url('book_detail', pk=book.pk) }}">{{ book.title }}</a>
+                            </td>
+                            <td>{{ book.author or '—' }}</td>
+                            <td>
+                                {% if book.is_available() %}
+                                    <span class="badge">Свободна</span>
+                                {% else %}
+                                    {% set borrower = book.current_borrower() %}
+                                    <span class="badge badge--dark">У {{ borrower.username }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="actions">
+                                <a href="{{ url('book_edit', pk=book.pk) }}" class="btn btn--small btn--secondary">Редактировать</a>
+                                <a href="{{ url('book_delete', pk=book.pk) }}" class="btn btn--small btn--secondary">Удалить</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="history__empty">Вы ещё не добавили книг.</p>
+        <p><a href="{{ url('book_add') }}" class="btn btn--secondary">Добавить первую книгу</a></p>
+    {% endif %}
+</article>
+
+<article class="dashboard-section">
+    <div class="dashboard-section__header">
+        <h2 class="dashboard-section__title">Книги, которые я взял(а)</h2>
+    </div>
+
+    {% if my_borrowings %}
+        <div class="borrowing-list">
+            {% for borrowing in my_borrowings %}
+                <div class="borrowing-item">
+                    <div class="borrowing-item__book">
+                        <strong>
+                            <a href="{{ url('book_detail', pk=borrowing.book.pk) }}">{{ borrowing.book.title }}</a>
+                        </strong>
+                        <span class="borrowing-item__owner">{{ borrowing.book.owner.username }}</span>
+                    </div>
+                    <div class="borrowing-item__due {% if borrowing.is_overdue() %}overdue{% endif %}">
+                        {% if borrowing.due_date %}
+                            Срок: {{ borrowing.due_date.strftime('%d.%m.%Y') }}
+                        {% else %}
+                            Срок не указан
+                        {% endif %}
+                        <a href="{{ url('book_return', pk=borrowing.book.pk) }}" class="btn btn--small btn--primary">Вернуть книгу</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="history__empty">Вы ничего не взяли.</p>
+    {% endif %}
+</article>
+
+{% if history %}
+    <article class="dashboard-section">
+        <div class="dashboard-section__header">
+            <h2 class="dashboard-section__title">История прочитанного</h2>
+        </div>
+        
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Книга</th>
+                        <th>Дата выдачи</th>
+                        <th>Дата возврата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in history %}
+                        <tr>
+                            <td>{{ record.book.title }}</td>
+                            <td>{{ record.borrowed_at.strftime('%d.%m.%Y') }}</td>
+                            <td>{{ record.returned_at.strftime('%d.%m.%Y') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+{% endif %}
+{% endblock %}

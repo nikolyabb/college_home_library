@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация — Домашняя библиотека{% endblock %}
+
+{% block content %}
+<article class="auth-card">
+    <header class="auth-card__header">
+        <h1 class="auth-card__title">Регистрация</h1>
+        <p class="auth-card__subtitle">Создайте аккаунт, чтобы делиться книгами.</p>
+    </header>
+
+    <form method="post">
+        {{ csrf_input }}
+        {% if form.non_field_errors() %}
+            <div class="error">{{ form.non_field_errors()[0] }}</div>
+        {% endif %}
+        {% for field in form %}
+            <div class="form-row">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small class="muted">{{ field.help_text|safe }}</small>
+                {% endif %}
+                {% if field.errors %}
+                    <div class="error">{{ field.errors[0] }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn--primary auth-submit">Зарегистрироваться</button>
+    </form>
+
+    <footer class="auth-card__footer">
+        <p>Уже есть аккаунт? <a href="{{ url('login') }}">Войти</a>.</p>
+    </footer>
+</article>
+{% endblock %}

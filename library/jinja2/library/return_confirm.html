@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Вернуть книгу — Домашняя библиотека{% endblock %}
+
+{% block content %}
+<article>
+    <header>
+        <h2>Вернуть книгу «{{ book.title }}»</h2>
+    </header>
+
+    <p>
+        Книга сейчас у <strong>{{ borrowing.borrower.username }}</strong>
+        с {{ borrowing.borrowed_at.strftime('%d.%m.%Y') }}.
+        {% if borrowing.due_date %}
+            Срок возврата: {{ borrowing.due_date.strftime('%d.%m.%Y') }}.
+        {% endif %}
+    </p>
+
+    <form method="post">
+        {{ csrf_input }}
+        <div class="form-actions">
+            <button type="submit" class="btn btn--primary">Вернуть книгу</button>
+            <a href="{{ url('book_detail', pk=book.pk) }}" class="btn btn--secondary">Отмена</a>
+        </div>
+    </form>
+</article>
+{% endblock %}

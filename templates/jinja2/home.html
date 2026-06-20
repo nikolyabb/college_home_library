@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная — Домашняя библиотека{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <span class="hero__label">Домашняя библиотека</span>
+    <h1 class="hero__title">Делитесь книгами с друзьями и не забывайте, кому что отдали.</h1>
+    <p class="hero__desc">
+        Кратко, удобно, по делу. Добавляйте книги, смотрите, что свободно, берите почитать и отмечайте возврат.
+    </p>
+
+    {% if request.user.is_authenticated %}
+        <div class="hero__actions">
+            <a href="{{ url('book_list') }}" class="btn btn--primary">Смотреть каталог</a>
+            <a href="{{ url('dashboard') }}" class="btn btn--secondary">Моя полка</a>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat__value">{{ total_books }}</div>
+                <div class="stat__label">Всего книг</div>
+            </div>
+            <div class="stat">
+                <div class="stat__value">{{ borrowed_books }}</div>
+                <div class="stat__label">На руках</div>
+            </div>
+            <div class="stat">
+                <div class="stat__value">{{ my_books }}</div>
+                <div class="stat__label">Мои книги</div>
+            </div>
+        </div>
+    {% else %}
+        <div class="hero__actions">
+            <a href="{{ url('login') }}" class="btn btn--primary">Войти</a>
+            <a href="{{ url('register') }}" class="btn btn--secondary">Создать аккаунт</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

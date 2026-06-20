@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Вход — Домашняя библиотека{% endblock %}
+
+{% block content %}
+<article class="auth-card">
+    <header class="auth-card__header">
+        <h1 class="auth-card__title">Вход</h1>
+        <p class="auth-card__subtitle">Войдите, чтобы управлять книгами.</p>
+    </header>
+
+    <form method="post">
+        {{ csrf_input }}
+
+        {% if form.non_field_errors() %}
+            <article class="message message--error">
+                {% for error in form.non_field_errors() %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </article>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="form-row">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small class="muted">{{ field.help_text|safe }}</small>
+                {% endif %}
+                {% if field.errors %}
+                    <div class="error">{{ field.errors[0] }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn--primary auth-submit">Войти</button>
+    </form>
+
+    <footer class="auth-card__footer">
+        <p>Ещё нет аккаунта? <a href="{{ url('register') }}">Зарегистрироваться</a>.</p>
+    </footer>
+</article>
+{% endblock %}

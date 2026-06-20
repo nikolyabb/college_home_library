@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Взять книгу — Домашняя библиотека{% endblock %}
+
+{% block content %}
+<article class="form-card">
+    <header class="form-card__header">
+        <h1 class="form-card__title">Взять книгу «{{ book.title }}»</h1>
+    </header>
+
+    <p class="form-card__hint">
+        Вы собираетесь взять книгу у <strong>{{ book.owner.username }}</strong>.
+        Выберите месяц и год возврата. День будет установлен как <strong>1-е число</strong>.
+    </p>
+
+    <p class="muted" style="font-size: 13px; margin-bottom: 8px;">
+        Формат: <code>2026-08</code> (год-месяц).
+    </p>
+
+    <form method="post">
+        {{ csrf_input }}
+        {% for field in form %}
+            <div class="form-row">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                    <div class="error">{{ field.errors[0] }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn--primary">Взять почитать</button>
+            <a href="{{ url('book_detail', pk=book.pk) }}" class="btn btn--secondary">Отмена</a>
+        </div>
+    </form>
+</article>
+{% endblock %}

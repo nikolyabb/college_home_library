@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Домашняя библиотека{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ static('css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="header">
+        <div class="container header__inner">
+            <a href="{{ url('home') }}" class="logo">Домашняя библиотека</a>
+            <nav class="nav" aria-label="Главная навигация">
+                {% if request.user.is_authenticated %}
+                    <a href="{{ url('book_list') }}" class="nav__link{% if request.path == url('book_list') %} nav__link--active{% endif %}">Каталог</a>
+                    <a href="{{ url('dashboard') }}" class="nav__link{% if request.path == url('dashboard') %} nav__link--active{% endif %}">Моя полка</a>
+                    <span class="nav__user">{{ request.user.username }}</span>
+                    <form action="{{ url('logout') }}" method="post" class="nav__logout">
+                        {{ csrf_input }}
+                        <button type="submit" class="btn btn--small btn--secondary">Выйти</button>
+                    </form>
+                {% else %}
+                    <a href="{{ url('login') }}" class="btn btn--small btn--secondary">Войти</a>
+                    <a href="{{ url('register') }}" class="btn btn--small btn--primary">Регистрация</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            {% with messages = get_messages(request) %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <article class="message message--{{ message.tags|default('info') }}">
+                            {{ message }}
+                        </article>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__inner">
+            <p class="footer__copy">Итоговая работа — Домашняя библиотека на Django</p>
+        </div>
+    </footer>
+</body>
+</html>

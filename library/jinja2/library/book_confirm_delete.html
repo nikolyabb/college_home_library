@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Удалить книгу — Домашняя библиотека{% endblock %}
+
+{% block content %}
+<article>
+    <header>
+        <h2>Удалить книгу</h2>
+    </header>
+
+    <p>Вы уверены, что хотите удалить книгу <strong>«{{ book.title }}»</strong>?</p>
+
+    <form method="post">
+        {{ csrf_input }}
+        <div class="form-actions">
+            <button type="submit" class="btn btn--primary">Удалить</button>
+            <a href="{{ url('book_detail', pk=book.pk) }}" class="btn btn--secondary">Отмена</a>
+        </div>
+    </form>
+</article>
+{% endblock %}
